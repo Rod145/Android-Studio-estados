@@ -49,7 +49,8 @@ fun inicioScreen(modifier: Modifier = Modifier){
         }) {
             Text("Sumar")
         }
-        Text(text= "$resultado", fontSize = 20.sp)
+        Spacer(modifier =  Modifier.padding(10.dp))
+        OutlinedTextField(value = resultado.toString(), onValueChange = {}, readOnly = true, shape = RoundedCornerShape(20.dp), modifier = Modifier.width(100.dp).height(55.dp))
     }
 }
 @Composable
