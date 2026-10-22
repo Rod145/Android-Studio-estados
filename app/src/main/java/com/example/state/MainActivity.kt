@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
                     var x by rememberSaveable() { mutableStateOf(0) }
                     var y by rememberSaveable() { mutableStateOf(0) }
                     inicioScreen(
-                        modifier = Modifier.padding(innerPadding),x,y,{x+=1}
+                        modifier = Modifier.padding(innerPadding)
                     )
                 }
             }
