@@ -1,10 +1,17 @@
 import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -25,25 +32,34 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun inicioScreen(modifier: Modifier = Modifier){
-    Column(modifier = modifier.padding(top = 100.dp)) {
+    Column(modifier = modifier.padding(top = 50.dp)) {
         var tarjetas = rememberSaveable { mutableStateListOf<Tarjeta>() }
             var texto1 by rememberSaveable { mutableStateOf("") }
             var texto2 by rememberSaveable { mutableStateOf("") }
-        OutlinedTextField(value = texto1, onValueChange = {texto1 = it}, shape =)
-        OutlinedTextField(value = texto2, onValueChange = {texto2 = it})
-        Button(onClick ={
-            if (texto1.isNotBlank()&&texto2.isNotBlank()){
-            tarjetas.add(Tarjeta(nombre = texto1, apellido = texto2))
-                texto1=""
-                texto2=""
-        }
-            return@Button} ) { Text("Agregar")}
-        LazyColumn {
-            items(tarjetas) { tarjeta ->
-                mycard(tarjeta,{tarjetas.remove(tarjeta)})
-            }
+        OutlinedTextField(value = texto1, onValueChange = {texto1 = it}, shape = RoundedCornerShape(20.dp), modifier = Modifier.width(150.dp).height(50.dp))
+        Spacer(modifier = Modifier.padding(5.dp))
+        OutlinedTextField(value = texto2, onValueChange = {texto2 = it}, shape = RoundedCornerShape(20.dp), modifier = Modifier.width(150.dp).height(50.dp))
+        Spacer(modifier = Modifier.padding(5.dp))
+        Row{
+            Button(onClick ={
+                if (texto1.isNotBlank()&&texto2.isNotBlank()){
+                    tarjetas.add(Tarjeta(nombre = texto1, apellido = texto2))
+                    texto1=""
+                    texto2=""
+                }
+                return@Button}) { Text("Agregar")}
+            Button(onClick ={
+                    tarjetas.clear()
+                }, modifier = Modifier.offset(10.dp)) { Text("Eliminar todo")}
         }
 
+        Spacer(modifier = Modifier.padding(5.dp))
+        LazyColumn(modifier=Modifier.heightIn(max = 100.dp)) {
+            items(tarjetas) { tarjeta ->
+                mycard(tarjeta,{tarjetas.remove(tarjeta)})
+                Spacer(modifier = Modifier.padding(5.dp))
+            }
+        }
     }
     }
 
