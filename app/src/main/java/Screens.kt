@@ -31,37 +31,68 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun inicioScreen(modifier: Modifier = Modifier){
+fun inicioScreen(modifier: Modifier = Modifier) {
     Column(modifier = modifier.padding(top = 50.dp)) {
         var tarjetas = rememberSaveable { mutableStateListOf<Tarjeta>() }
-            var texto1 by rememberSaveable { mutableStateOf("") }
-            var texto2 by rememberSaveable { mutableStateOf("") }
-        OutlinedTextField(value = texto1, onValueChange = {texto1 = it}, shape = RoundedCornerShape(20.dp), modifier = Modifier.width(150.dp).height(50.dp))
+        var texto1 by rememberSaveable { mutableStateOf("") }
+        var texto2 by rememberSaveable { mutableStateOf("") }
+        var texto3 by rememberSaveable { mutableStateOf("") }
+        OutlinedTextField(
+            value = texto1,
+            onValueChange = { texto1 = it },
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.width(150.dp).height(60.dp),
+            label = { Text("Nombre") })
         Spacer(modifier = Modifier.padding(5.dp))
-        OutlinedTextField(value = texto2, onValueChange = {texto2 = it}, shape = RoundedCornerShape(20.dp), modifier = Modifier.width(150.dp).height(50.dp))
+        OutlinedTextField(
+            value = texto2,
+            onValueChange = { texto2 = it },
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.width(150.dp).height(60.dp),
+            label = { Text("Apellido") })
         Spacer(modifier = Modifier.padding(5.dp))
-        Row{
-            Button(onClick ={
-                if (texto1.isNotBlank()&&texto2.isNotBlank()){
-                    tarjetas.add(Tarjeta(nombre = texto1, apellido = texto2))
-                    texto1=""
-                    texto2=""
+        OutlinedTextField(
+            value = texto3,
+            onValueChange = { texto3 = it },
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.width(150.dp).height(60.dp),
+            label = { Text("Color tarjeta") })
+        Spacer(modifier = Modifier.padding(5.dp))
+        Row {
+            Button(onClick = {
+                if (texto1.isNotBlank() && texto2.isNotBlank()) {
+                        var color=when(texto3.lowercase()){
+                            "rojo"-> Color.Red
+                            "azul"-> Color.Blue
+                            "amarillo"-> Color.Yellow
+                            "blanco"-> Color.White
+                            "verde"-> Color.Green
+                            "negro"-> Color.Black
+                            "transparante"-> Color.Transparent
+
+                            else -> Color.Gray
+                        }
+                    tarjetas.add(Tarjeta(nombre = texto1, apellido = texto2,color = color))
+                    texto1 = ""
+                    texto2 = ""
+                    texto3 = ""
                 }
-                return@Button}) { Text("Agregar")}
-            Button(onClick ={
-                    tarjetas.clear()
-                }, modifier = Modifier.offset(10.dp)) { Text("Eliminar todo")}
+                return@Button
+            }) { Text("Agregar") }
+            Button(onClick = {
+                tarjetas.clear()
+            }, modifier = Modifier.offset(10.dp)) { Text("Eliminar todo") }
         }
 
         Spacer(modifier = Modifier.padding(5.dp))
-        LazyColumn(modifier=Modifier.heightIn(max = 100.dp)) {
+        LazyColumn(modifier = Modifier.heightIn(max = 100.dp)) {
             items(tarjetas) { tarjeta ->
-                mycard(tarjeta,{tarjetas.remove(tarjeta)})
+                mycard(tarjeta, miclick2 = { tarjetas.remove(tarjeta) })
                 Spacer(modifier = Modifier.padding(5.dp))
             }
         }
     }
-    }
+}
 
 @Composable
 @Preview
