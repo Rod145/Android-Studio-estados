@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -15,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.state.ui.theme.StateTheme
 import inicioScreen
@@ -26,10 +28,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             StateTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    var x by rememberSaveable() { mutableStateOf(0) }
-                    var y by rememberSaveable() { mutableStateOf(0) }
                     inicioScreen(
-                        modifier = Modifier.padding(innerPadding),x,y,{x+=1}
+                        modifier = Modifier.padding(innerPadding).fillMaxSize().background(Color.White)
                     )
                 }
             }
