@@ -18,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.core.view.WindowCompat.enableEdgeToEdge
 import com.example.state.ui.theme.StateTheme
 import inicioScreen
 
@@ -37,18 +39,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    StateTheme {
-        Greeting("Android")
-    }
+        StateTheme {
+            Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                inicioScreen(
+                    modifier = Modifier.padding(innerPadding).fillMaxSize().background(Color.White)
+                )
+            }
+        }
 }

@@ -42,22 +42,13 @@ import org.w3c.dom.Text
 @Composable
 fun TarjetaVisitasDiarias(modifier: Modifier= Modifier,visitas: Int){
     Card(modifier=modifier, shape = RoundedCornerShape(25.dp), colors = CardColors(Color(0xFFEAEAEE),Color.Black,Color.Unspecified,Color.Unspecified)) {
-        ConstraintLayout(modifier= Modifier.fillMaxSize()) {
-            val b1=createRef()
-            Box(modifier=Modifier.constrainAs(b1){
-                top.linkTo(parent.top, margin = 16.dp)
-                bottom.linkTo(parent.bottom, margin = 16.dp)
-                start.linkTo(parent.start, margin = 16.dp)
-                end.linkTo(parent.end, margin = 16.dp)
-                width= Dimension.fillToConstraints
-                height= Dimension.fillToConstraints
-            }) {
+            Box(modifier=Modifier.padding(16.dp)) {
                 Text("Visitas del dia", color = Color(0xFF595353), fontSize = 17.sp)
-                Text("$visitas", modifier=Modifier.width(340.dp).offset(y = 5.dp), textAlign = TextAlign.End, fontSize = 40.sp)
+                Text("$visitas", modifier=Modifier.width(340.dp), textAlign = TextAlign.End, fontSize = 40.sp)
             }
         }
     }
-}
+
 @Composable
 fun Tarjetadecambios(modifier: Modifier= Modifier,personas:Int){
     var porcentajeP=(personas*100)/50
@@ -72,17 +63,7 @@ fun Tarjetadecambios(modifier: Modifier= Modifier,personas:Int){
         else-> Color(0xFF015903)
     }
     Card(modifier=modifier, shape = RoundedCornerShape(25.dp), colors = CardColors(fondoColor,contenidoColor,Color.Black,Color.Black)) {
-       ConstraintLayout(modifier= Modifier.fillMaxSize()) {
-           val b1=createRef()
-           Box(modifier=Modifier.constrainAs(b1){
-               top.linkTo(parent.top, margin = 16.dp)
-               bottom.linkTo(parent.bottom, margin = 16.dp)
-               start.linkTo(parent.start, margin = 16.dp)
-               end.linkTo(parent.end, margin = 16.dp)
-               width= Dimension.fillToConstraints
-               height= Dimension.fillToConstraints
-           }) {
-               Column{
+           Column(modifier=Modifier.padding(16.dp)) {
                    Text("$personas/50", textAlign = TextAlign.End,modifier=Modifier.width(250.dp), fontSize = 70.sp, fontWeight = FontWeight.Bold)
                    Text("personas en la sala", textAlign = TextAlign.End, fontWeight = FontWeight.SemiBold,color=Color(0xB7020202),modifier = Modifier.width(230.dp))
                    Spacer(Modifier.padding(10.dp))
@@ -91,10 +72,6 @@ fun Tarjetadecambios(modifier: Modifier= Modifier,personas:Int){
                    Text("$porcentajeP% de ocupacion", fontSize = 17.sp,color = contenidoColor, textAlign = TextAlign.End, fontWeight = FontWeight.SemiBold,modifier = Modifier.width(230.dp))
                    Spacer(Modifier.padding(5.dp))
                    Text("Aforo disponible", textAlign = TextAlign.End, fontSize = 10.sp, fontWeight = FontWeight.SemiBold,color=Color(0xB7020202),modifier = Modifier.width(200.dp))
-
-               }
-
-           }
        }
     }
 }
@@ -102,36 +79,51 @@ fun Tarjetadecambios(modifier: Modifier= Modifier,personas:Int){
 fun inicioScreen(modifier: Modifier = Modifier)
 {var personas by rememberSaveable { mutableIntStateOf(0) }
     var visitasdaily by rememberSaveable { mutableIntStateOf(0) }
-        ConstraintLayout(modifier=modifier) {
-            val b1=createRef()
-            Box(modifier=Modifier.constrainAs(b1){
-                top.linkTo(parent.top, margin = 16.dp)
-                bottom.linkTo(parent.bottom, margin = 16.dp)
-                start.linkTo(parent.start, margin = 16.dp)
-                end.linkTo(parent.end, margin = 16.dp)
-                height= Dimension.fillToConstraints
-                width= Dimension.fillToConstraints
-            }) {
-                Column{
-                    Text("Biblioteca Central", fontSize = 24.sp, color= Color.Black)
-                    Spacer(modifier=Modifier.padding(13.dp))
-                    Text("Sala de estudio | capacidad 50",color= Color(0xFF424344))
-                    Tarjetadecambios(modifier = Modifier.fillMaxWidth().height(300.dp).padding(vertical = 20.dp), personas = personas)
-                    Row{OutlinedButton(onClick = {if (personas==0){return@OutlinedButton}; personas-=1}, colors = ButtonColors(Color.Transparent, Color.Black, Color.Unspecified,Color.Unspecified), modifier = Modifier.height(55.dp).width(150.dp), border = BorderStroke(width = 1.dp, color = Color(
-                        0xFF654EA2
-                    )
-                    )) {Text("- Sale") }
-                        OutlinedButton(onClick = {if(personas==50){return@OutlinedButton}; personas+=1; visitasdaily+=1}, colors = ButtonColors(Color(0xFF664FA3),Color.Black,Color.Unspecified,Color.Unspecified), modifier = Modifier.height(55.dp).width(150.dp).offset(50.dp), border = null) {Text("+ Entra", color = Color.White) }}
-                    TarjetaVisitasDiarias(visitas=visitasdaily, modifier = Modifier.fillMaxWidth().height(90.dp).offset(y = 25.dp))
+    Box(modifier=modifier){
+        Column(modifier=Modifier.fillMaxSize().padding(16.dp)) {
+        Text("Biblioteca Central", fontSize = 24.sp, color= Color.Black)
+        Spacer(modifier=Modifier.padding(13.dp))
+        Text("Sala de estudio | capacidad 50",color= Color(0xFF424344))
+        Tarjetadecambios(modifier = Modifier.fillMaxWidth().height(300.dp).padding(vertical = 20.dp), personas = personas)
+        Row{OutlinedButton(onClick = {if (personas==0){return@OutlinedButton}; personas-=1}, colors = ButtonColors(Color.Transparent, Color.Black, Color.Unspecified,Color.Unspecified), modifier = Modifier.height(55.dp).width(170.dp), border = BorderStroke(width = 1.dp, color = Color(
+            0xFF654EA2
+        )
+        )) {Text("- Sale") }
+            Spacer(modifier= Modifier.padding(start = 20.dp))
+            OutlinedButton(onClick = {if(personas==50){return@OutlinedButton}; personas+=1; visitasdaily+=1}, colors = ButtonColors(Color(0xFF664FA3),Color.Black,Color.Unspecified,Color.Unspecified), modifier = Modifier.height(55.dp).width(170.dp), border = null) {Text("+ Entra", color = Color.White) }}
+        Spacer(modifier = Modifier.padding(5.dp))
+        TarjetaVisitasDiarias(modifier = Modifier.fillMaxWidth().height(90.dp),visitas=visitasdaily)
+        Row(modifier = Modifier.padding(top = 30.dp)){
+            Box(modifier = Modifier.width(15.dp).height(15.dp).clip(RoundedCornerShape(15.dp)).background(Color(
+                0xFF2E7C32
+            )
+            ))
+            Text(" Verde< 70%", color = Color(0xFF595353))
+            Spacer(modifier = Modifier.padding(5.dp))
+            Box(modifier = Modifier.width(15.dp).height(15.dp).clip(RoundedCornerShape(15.dp)).background(Color(
+                0xFFF7A725
+            ))
+            )
+            Text(" Amarillo 70-99%", color = Color(0xFF595353))
+            Spacer(modifier = Modifier.padding(5.dp))
+            Box(modifier = Modifier.width(15.dp).height(15.dp).clip(RoundedCornerShape(15.dp)).background(Color(
+                0xFFB85854
+            )
+            ))
+            Text(" Rojo 100%", color = Color(0xFF595353))
+        }
+        Spacer(modifier = Modifier.padding(top = 70.dp))
+        OutlinedButton(modifier = Modifier.fillMaxWidth().height(50.dp), border = BorderStroke(width = 1.dp,color = Color(0xFFB95955)),onClick = {personas=0; visitasdaily=0}, colors = ButtonColors(Color.Transparent,Color(
+            0xFFB95955
+        ),Color.Unspecified,Color.Unspecified)) { Text("Cerrar dia", fontWeight = FontWeight.SemiBold) }
 
-                }
+    }}
 
-            }
 
     }
-}
+
 @Composable
 @Preview
 fun pr(){
-    inicioScreen(modifier = Modifier.fillMaxSize().background(Color.White))
+    inicioScreen(modifier = Modifier.background(Color.White))
 }
