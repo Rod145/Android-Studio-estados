@@ -5,7 +5,6 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun inicioScreen(modifier: Modifier= Modifier){
     Column(modifier = modifier) {
-
     }
 }
 @Composable
