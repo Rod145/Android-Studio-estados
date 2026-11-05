@@ -111,9 +111,6 @@ fun pantalla2(modifier:Modifier= Modifier,clicko2:(Int)-> Unit){
     }
         OutlinedTextField(modifier = Modifier.fillMaxWidth(),value = us.correo, onValueChange = {}, enabled = false, colors = OutlinedTextFieldDefaults.colors(Color.Black, disabledTextColor = Color.Black), label = {Text("Correo", color = Color.Black)})
         Spacer(modifier = Modifier.padding(top=20.dp))
-        OutlinedTextField(modifier = Modifier.fillMaxWidth(), onValueChange = {},value = us.contraseña, visualTransformation = if(!ver){
-            PasswordVisualTransformation()}else{
-            VisualTransformation.None}, colors = OutlinedTextFieldDefaults.colors(Color.Black, unfocusedTextColor = Color.Black), label = {Text("Contraseña", color = Color.Black )}, trailingIcon = { FilterChip(modifier = Modifier.padding(end = 10.dp),selected = ver, onClick = {ver=!ver}, label = {Text(if(ver){"Ocultar"}else{"mostrar"}, color = Color.Black)}) })
         Spacer(modifier = Modifier.padding(top=20.dp))
         Button(onClick = {clicko2(1)},modifier = Modifier.fillMaxWidth().height(50.dp)) {Text("Cerrar sesion", color = Color.White)}
         }
