@@ -89,7 +89,6 @@ fun inicioScreen(modifier: Modifier= Modifier,clicko:(Int)-> Unit){
 }
 @Composable
 fun pantalla2(modifier:Modifier= Modifier,clicko2:(Int)-> Unit){
-    var ver by remember { mutableStateOf(false) }
     Column(modifier = modifier.padding(16.dp)) {
         Spacer(modifier = Modifier.padding(top = 50.dp))
         Column(modifier=Modifier.fillMaxWidth(),horizontalAlignment = Alignment.CenterHorizontally) {
