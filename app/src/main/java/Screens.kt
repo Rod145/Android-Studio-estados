@@ -35,9 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
-import org.w3c.dom.Text
 
 @Composable
 fun TarjetaVisitasDiarias(modifier: Modifier= Modifier,visitas: Int){
