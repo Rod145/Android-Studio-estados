@@ -3,6 +3,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -14,10 +15,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun inicioScreen(modifier: Modifier = Modifier){
-    Column(modifier = modifier) {
+    Column(modifier = modifier.padding(16.dp)) {
             var texto by remember { mutableStateOf("") }
             var banderaT by remember { mutableStateOf(true)}
             TextField(value = texto, onValueChange = {texto = it}, readOnly = true)

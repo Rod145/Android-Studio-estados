@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
             StateTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     inicioScreen(
-                        modifier = Modifier.padding(innerPadding).fillMaxSize().background(Color.Black)
+                        modifier = Modifier.padding(innerPadding).fillMaxSize().background(Color.White)
                     )
                 }
             }
