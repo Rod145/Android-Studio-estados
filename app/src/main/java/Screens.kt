@@ -24,6 +24,7 @@ import androidx.compose.material3.SliderState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun tarjetatexto(modifier: Modifier= Modifier,button1: Boolean,button3: Boolean,valor: TextUnit,modoOscuro: Boolean,fuente2: Boolean){
@@ -60,47 +62,41 @@ fun tarjetatexto(modifier: Modifier= Modifier,button1: Boolean,button3: Boolean,
     }
 }
 @Composable
-fun inicioScreen(modifier: Modifier= Modifier){
-    var rad1 by remember { mutableStateOf(false) }
-    var rad2 by remember { mutableStateOf(true) }
-    var rad3 by remember { mutableStateOf(false) }
-    var valor by remember { mutableFloatStateOf(22f) }
-    var modoOscuro by remember { mutableStateOf(true) }
-    var fuente1 by remember { mutableStateOf(true) }
-    var fuente2 by remember { mutableStateOf(false) }
+fun inicioScreen(modifier: Modifier= Modifier,viewmodel:Rviewmodel= viewModel()){
+    val state=viewmodel.uiState.collectAsState().value
     Column(modifier = modifier.padding(16.dp)) {
         Text("<- Ajustes de lectura", color = Color.Black, fontSize = 22.sp)
         Spacer(modifier= Modifier.padding(top= 20.dp))
         Row{
             Text("tamaño de letra", color = Color.Black, fontSize = 17.sp)
             Spacer(modifier = Modifier.padding(start = 180.dp))
-            Text("${valor.toInt()}"+" sp", color = Color.Black, fontSize = 17.sp)
+            Text("${state.valor.toInt()}"+" sp", color = Color.Black, fontSize = 17.sp)
         }
-        Slider(value = valor, onValueChange = {valor = it}, valueRange = 14f..32f, modifier = Modifier.scale(1f,0.8f),)
+        Slider(value = state.valor, onValueChange = {viewmodel.valor(it)}, valueRange = 14f..32f, modifier = Modifier.scale(1f,0.8f),)
         Text("interlineado", color = Color.Black, fontSize = 19.sp)
         Row(verticalAlignment = Alignment.CenterVertically){
-            RadioButton(selected=rad1, onClick = {rad1=true;rad2=false;rad3=false})
+            RadioButton(selected=state.rad1, onClick = {viewmodel.rad1(true);viewmodel.rad2(false);viewmodel.rad3(false)})
             Text("Compacto",color=Color.Black)
-            RadioButton(selected=rad2, onClick = {rad2=true;rad1=false;rad3=false})
+            RadioButton(selected=state.rad2, onClick = {viewmodel.rad1(false);viewmodel.rad2(true);viewmodel.rad3(false)})
             Text("Normal", color = Color.Black)
-            RadioButton(selected=rad3, onClick = {rad2=false;rad1=false;rad3=true})
+            RadioButton(selected=state.rad3, onClick = {viewmodel.rad1(false);viewmodel.rad2(false);viewmodel.rad3(true)})
             Text("Amplio",color=Color.Black)
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Modo oscuro", color = Color.Black, fontSize = 17.sp)
             Spacer(modifier=Modifier.weight(1f))
-            Switch(checked = modoOscuro,{modoOscuro=it})
+            Switch(checked = state.modoOscuro,{viewmodel.modoOscuro(it)})
         }
         Row{
             Text("Fuente", color = Color.Black, fontSize = 17.sp)
             Spacer(modifier = Modifier.weight(1f))
-            FilterChip(selected = fuente1,{fuente1=true;fuente2=false}, label = {Text("Serif",color=Color.Black)})
+            FilterChip(selected = state.fuente1,{viewmodel.fuente1(true);viewmodel.fuente2(false)}, label = {Text("Serif",color=Color.Black)})
             Spacer(modifier= Modifier.padding(start = 7.dp))
-            FilterChip(selected = fuente2,{fuente2=true;fuente1=false}, label = {Text("Sans",color=Color.Black)})
+            FilterChip(selected = state.fuente2,{viewmodel.fuente1(false);viewmodel.fuente2(true)}, label = {Text("Sans",color=Color.Black)})
         }
-        tarjetatexto(modifier = Modifier.fillMaxWidth().height(300.dp), button1 = rad1, button3 = rad3,valor = valor.sp, modoOscuro= modoOscuro, fuente2 = fuente2)
+        tarjetatexto(modifier = Modifier.fillMaxWidth().height(300.dp), button1 = state.rad1, button3 = state.rad3,valor = state.valor.sp, modoOscuro= state.modoOscuro, fuente2 = state.fuente2)
         Spacer(modifier = Modifier.weight(1f))
-        OutlinedButton(onClick = {valor=22f;rad1=false;rad2=true;rad3=false;modoOscuro=true;fuente1=true;fuente2=false}, modifier = Modifier.fillMaxWidth().height(50.dp)) {Text("Restablecer", color = Color.Black) }
+        OutlinedButton(onClick = {viewmodel.valor(22f);viewmodel.rad1(false);viewmodel.rad2(true);viewmodel.rad3(false);viewmodel.modoOscuro(true);viewmodel.fuente1(true);viewmodel.fuente2(false)}, modifier = Modifier.fillMaxWidth().height(50.dp)) {Text("Restablecer", color = Color.Black) }
     }
 }
 @Composable
