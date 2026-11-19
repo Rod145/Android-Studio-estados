@@ -21,6 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+
 @Composable
 fun e(to: String){
     var to=to.toIntOrNull()
@@ -33,14 +36,15 @@ fun e(to: String){
     }
 }
 @Composable
-fun inicioScreen(modifier: Modifier = Modifier){
+fun inicioScreen(modifier: Modifier = Modifier,viewmodel:Rviewmodel= viewModel()){
+    val state=viewmodel.uiState.collectAsState().value
     Column(modifier = modifier) {
-        var texto by rememberSaveable { mutableStateOf("") }
-        OutlinedTextField(value = texto, onValueChange = {texto = it}, shape = RoundedCornerShape(20.dp),modifier = Modifier.height(60.dp).width(100.dp))
-        e(texto)
+        OutlinedTextField(value = state.texto, onValueChange = {viewmodel.texto1(it)}, shape = RoundedCornerShape(20.dp),modifier = Modifier.height(60.dp).width(100.dp))
+        e(state.texto)
     }
 }
 @Composable
 @Preview
 fun pr(){
+    inicioScreen(modifier = Modifier.fillMaxSize().background(Color.White))
 }
