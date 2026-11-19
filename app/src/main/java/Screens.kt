@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -37,12 +38,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import java.util.Locale
 
 @Composable
-fun RatingBar(modifier: Modifier = Modifier, textodesc: String, clicko: (Int) -> Unit) {
-
-    var rating by remember { mutableIntStateOf(0) }
+fun RatingBar(modifier: Modifier = Modifier, textodesc: String, rating: Int, clicko: (Int) -> Unit) {
     Column(modifier = modifier) {
         Text(textodesc, color = Color(0xFF5E5E5E), fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.padding(top = 10.dp))
@@ -61,72 +61,27 @@ fun RatingBar(modifier: Modifier = Modifier, textodesc: String, clicko: (Int) ->
                     modifier = Modifier
                         .size(40.dp)
                         .clickable {
-                            rating = i
-                            clicko(rating)
+                            clicko(i)
                         }
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
             when (rating) {
-                1 -> Text(
-                    "Malo",
-                    color = Color(0xFF181818),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                2 -> Text(
-                    "Regular",
-                    color = Color(0xFF181818),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                3 -> Text(
-                    "Bueno",
-                    color = Color(0xFF181818),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                4 -> Text(
-                    "Muy bueno",
-                    color = Color(0xFF181818),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                5 -> Text(
-                    "Excelente",
-                    color = Color(0xFF181818),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                else -> Text(
-                    "",
-                    color = Color(0xFF181818),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                1 -> Text("Malo", color = Color(0xFF181818), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                2 -> Text("Regular", color = Color(0xFF181818), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                3 -> Text("Bueno", color = Color(0xFF181818), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                4 -> Text("Muy bueno", color = Color(0xFF181818), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                5 -> Text("Excelente", color = Color(0xFF181818), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                else -> Text("", color = Color(0xFF181818), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
-
 }
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun inicioScreen(modifier: Modifier = Modifier) {
-    var cal1 by remember { mutableDoubleStateOf(0.0) }
-    var cal2 by remember { mutableDoubleStateOf(0.0) }
-    var cal3 by remember { mutableDoubleStateOf(0.0) }
-    var valor by remember { mutableStateOf("") }
-    var familiar by remember { mutableStateOf(false) }
-    var economico by remember { mutableStateOf(false) }
-    var rapido by remember { mutableStateOf(false) }
-    var romantico by remember { mutableStateOf(false) }
-    var vegetariano by remember { mutableStateOf(false) }
+fun inicioScreen(modifier: Modifier = Modifier, viewmodel: Rviewmodel = viewModel()) {
+    val state = viewmodel.uiState.collectAsState().value
 
     Column(modifier = modifier.padding(16.dp)) {
         Text(
@@ -143,11 +98,11 @@ fun inicioScreen(modifier: Modifier = Modifier) {
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.padding(top = 10.dp))
-        RatingBar(textodesc = "Comida") { calificacion -> cal1 = calificacion.toDouble() }
+        RatingBar(textodesc = "Comida", rating = state.cal1.toInt()) { calificacion -> viewmodel.cal1(calificacion.toDouble()) }
         Spacer(modifier = Modifier.padding(top = 10.dp))
-        RatingBar(textodesc = "Servicio") { calificacion -> cal2 = calificacion.toDouble() }
+        RatingBar(textodesc = "Servicio", rating = state.cal2.toInt()) { calificacion -> viewmodel.cal2(calificacion.toDouble()) }
         Spacer(modifier = Modifier.padding(top = 10.dp))
-        RatingBar(textodesc = "Ambiente") { calificacion -> cal3 = calificacion.toDouble() }
+        RatingBar(textodesc = "Ambiente", rating = state.cal3.toInt()) { calificacion -> viewmodel.cal3(calificacion.toDouble()) }
         Spacer(modifier = Modifier.padding(top = 10.dp))
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -162,7 +117,7 @@ fun inicioScreen(modifier: Modifier = Modifier) {
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    String.format(format = "%.2f", (cal1 + cal2 + cal3) / 3),
+                    String.format(format = "%.2f", (state.cal1 + state.cal2 + state.cal3) / 3),
                     color = Color(0xFF181818),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
@@ -175,14 +130,14 @@ fun inicioScreen(modifier: Modifier = Modifier) {
             }
         }
         OutlinedTextField(
-            value = valor,
-            isError = valor.length !in 21..180,
-            onValueChange = { if (valor.length <= 200){ valor= it} },
+            value = state.valor,
+            isError = state.valor.length !in 21..180,
+            onValueChange = { if (state.valor.length <= 200) { viewmodel.valor(it) } },
             label = { Text("Comentario", color = Color.Black) },
             modifier = Modifier.fillMaxWidth(),
             supportingText = {
                 Text(
-                    "${valor.length}/200", color = if (valor.length !in 21..180) {
+                    "${state.valor.length}/200", color = if (state.valor.length !in 21..180) {
                         Color.Red
                     } else {
                         Color.Black
@@ -192,30 +147,30 @@ fun inicioScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.padding(top = 20.dp))
         Row {
             FilterChip(
-                selected = familiar,
-                { familiar = !familiar },
+                selected = state.familiar,
+                { viewmodel.familiar(!state.familiar) },
                 label = { Text("Familiar", color = Color.Black) })
             Spacer(modifier = Modifier.padding(start = 10.dp))
             FilterChip(
-                selected = economico,
-                { economico = !economico },
+                selected = state.economico,
+                { viewmodel.economico(!state.economico) },
                 label = { Text("Economico", color = Color.Black) })
             Spacer(modifier = Modifier.padding(start = 10.dp))
             FilterChip(
-                selected = rapido,
-                { rapido = !rapido },
+                selected = state.rapido,
+                { viewmodel.rapido(!state.rapido) },
                 label = { Text("Rapido", color = Color.Black) })
             Spacer(modifier = Modifier.padding(start = 10.dp))
         }
         Row {
             FilterChip(
-                selected = romantico,
-                { romantico = !romantico },
+                selected = state.romantico,
+                { viewmodel.romantico(!state.romantico) },
                 label = { Text("Romántico", color = Color.Black) })
             Spacer(modifier = Modifier.padding(start = 10.dp))
             FilterChip(
-                selected = vegetariano,
-                { vegetariano = !vegetariano },
+                selected = state.vegetariano,
+                { viewmodel.vegetariano(!state.vegetariano) },
                 label = { Text("Vegetariano", color = Color.Black) })
         }
         Button(onClick = {}, modifier = Modifier
@@ -239,3 +194,4 @@ fun pr() {
             .background(Color.White)
     )
 }
+
