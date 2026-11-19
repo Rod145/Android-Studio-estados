@@ -14,8 +14,9 @@ data class MutableObject(
 )
 
 class Rviewmodel : ViewModel() {
-    private val _uiState= MutableStateFlow(MutableObject())
-    val uiState=_uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(MutableObject())
+    val uiState = _uiState.asStateFlow()
+
     fun rad1(rad: Boolean){
         _uiState.update { it.copy(rad1 = rad) }
     }
