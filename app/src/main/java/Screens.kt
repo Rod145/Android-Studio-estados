@@ -19,6 +19,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun botonpechocho(
@@ -146,73 +148,69 @@ fun cartaVenta(modifier: Modifier = Modifier, articulos: Int, subtotal: Double) 
 }
 
 @Composable
-fun inicioScreen(modifier: Modifier = Modifier) {
+fun inicioScreen(modifier: Modifier = Modifier, viewmodel:Rviewmodel= viewModel()) {
+    val state=viewmodel.uiState.collectAsState().value
     Column(modifier = modifier.padding(16.dp)) {
         Text("Tienda Don Pepe", color = Color.Black, fontSize = 24.sp)
         Spacer(modifier = Modifier.padding(top = 40.dp))
-        var total by remember { mutableDoubleStateOf(0.0) }
         val tortillas = 24.00
         val leche = 27.50
         val huevo = 52.00
         val frijol = 38.00
-        var cantidad1 by remember { mutableIntStateOf(0) }
-        var cantidad2 by remember { mutableIntStateOf(0) }
-        var cantidad3 by remember { mutableIntStateOf(0) }
-        var cantidad4 by remember { mutableIntStateOf(0) }
         botonpechocho(
             texto = "Tortillas 1kg",
             precio = "$tortillas",
-            cantidad = cantidad1,
+            cantidad = state.cantidad1,
             clico = {
-                if (cantidad1 != 0) {
-                    total -= tortillas; cantidad1--
+                if (state.cantidad1 != 0) {
+                    viewmodel.total(state.total-tortillas) ; viewmodel.cantidad1(state.cantidad1-1)
                 }
             },
-            clico2 = { total += tortillas; cantidad1++ })
+            clico2 = { viewmodel.total(state.total+tortillas); viewmodel.cantidad1(state.cantidad1+1)})
         Spacer(modifier = Modifier.padding(top = 20.dp))
         botonpechocho(
             texto = "Leche 1L",
             precio = "$leche",
-            cantidad = cantidad2,
+            cantidad = state.cantidad2,
             clico = {
-                if (cantidad2 != 0) {
-                    total -= leche; cantidad2--
+                if (state.cantidad2 != 0) {
+                    viewmodel.total(state.total-leche) ; viewmodel.cantidad2(state.cantidad2-1)
                 }
             },
-            clico2 = { total += leche; cantidad2++ })
+            clico2 = { viewmodel.total(state.total+leche) ; viewmodel.cantidad2(state.cantidad2+1)
+            })
         Spacer(modifier = Modifier.padding(top = 20.dp))
         botonpechocho(
             texto = "Huevo 12 pz",
             precio = "$huevo",
-            cantidad = cantidad3,
+            cantidad = state.cantidad3,
             clico = {
-                if (cantidad3 != 0) {
-                    total -= huevo; cantidad3--
+                if (state.cantidad3 != 0) {
+                    viewmodel.total(state.total-huevo) ; viewmodel.cantidad3(state.cantidad3-1)
                 }
             },
-            clico2 = { total += huevo; cantidad3++ })
+            clico2 = { viewmodel.total(state.total+huevo); viewmodel.cantidad3(state.cantidad3+1) })
         Spacer(modifier = Modifier.padding(top = 20.dp))
         botonpechocho(
             texto = "Frijol 1 kg",
             precio = "$frijol",
-            cantidad = cantidad4,
+            cantidad = state.cantidad4,
             clico = {
-                if (cantidad4 != 0) {
-                    total -= frijol; cantidad4--
-                }
+                if (state.cantidad4 != 0) {
+                    viewmodel.total(state.total-frijol); viewmodel.cantidad4(state.cantidad4-1)                }
             },
-            clico2 = { total += frijol; cantidad4++ })
+            clico2 = {viewmodel.total(state.total+frijol); viewmodel.cantidad4(state.cantidad4+1) })
         Spacer(modifier = Modifier.padding(top = 10.dp))
         cartaVenta(
             modifier = Modifier.height(220.dp),
-            articulos = cantidad1 + cantidad2 + cantidad3 + cantidad4,
-            subtotal = total
+            articulos = state.cantidad1 + state.cantidad2 + state.cantidad3 + state.cantidad4,
+            subtotal = state.total
         )
         Spacer(modifier = Modifier.padding(10.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             OutlinedButton(
                 onClick = {
-                    cantidad1 = 0; cantidad2 = 0; cantidad3 = 0; cantidad4 = 0; total = 0.0
+                    viewmodel.cantidad1(0); viewmodel.cantidad2(0); viewmodel.cantidad3(0); viewmodel.cantidad4(0); viewmodel.total(0.0)
                 }, colors = ButtonColors(
                     Color.Transparent,
                     Color.Unspecified, Color.Unspecified, Color.Unspecified
