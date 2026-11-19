@@ -34,11 +34,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             StateTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    var listanombres=rememberSaveable { mutableStateListOf<String>() }
-                    var x by rememberSaveable { mutableStateOf(0) }
                     inicioScreen(
-                        modifier = Modifier.padding(innerPadding),x,{x=x+1})
-                    //statehosting
+                        modifier = Modifier.padding(innerPadding))
                 }
             }
         }
