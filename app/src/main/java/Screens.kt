@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,34 +30,28 @@ import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun inicioScreen(modifier: Modifier = Modifier){
+fun inicioScreen(modifier: Modifier = Modifier,viewmodel:Rviewmodel= viewModel()){
+    val state=viewmodel.uitState.collectAsState().value
     Column(modifier = modifier.padding(top = 50.dp)) {
-        var tarjetas = rememberSaveable { mutableStateListOf<Tarjeta>() }
-            var texto1 by rememberSaveable { mutableStateOf("") }
-            var texto2 by rememberSaveable { mutableStateOf("") }
-        OutlinedTextField(value = texto1, onValueChange = {texto1 = it}, shape = RoundedCornerShape(20.dp), modifier = Modifier.width(150.dp).height(50.dp))
+        OutlinedTextField(value = state.texto1, onValueChange = {viewmodel.texto1(it)}, shape = RoundedCornerShape(20.dp), modifier = Modifier.width(150.dp).height(50.dp))
         Spacer(modifier = Modifier.padding(5.dp))
-        OutlinedTextField(value = texto2, onValueChange = {texto2 = it}, shape = RoundedCornerShape(20.dp), modifier = Modifier.width(150.dp).height(50.dp))
+        OutlinedTextField(value = state.texto2, onValueChange = {viewmodel.texto2(it)}, shape = RoundedCornerShape(20.dp), modifier = Modifier.width(150.dp).height(50.dp))
         Spacer(modifier = Modifier.padding(5.dp))
         Row{
             Button(onClick ={
-                if (texto1.isNotBlank()&&texto2.isNotBlank()){
-                    tarjetas.add(Tarjeta(nombre = texto1, apellido = texto2))
-                    texto1=""
-                    texto2=""
-                }
-                return@Button}) { Text("Agregar")}
+                viewmodel.agregar()}) { Text("Agregar")}
             Button(onClick ={
-                    tarjetas.clear()
-                }, modifier = Modifier.offset(10.dp)) { Text("Eliminar todo")}
+                viewmodel.eliminarTodo()
+            }, modifier = Modifier.offset(10.dp)) { Text("Eliminar todo")}
         }
 
         Spacer(modifier = Modifier.padding(5.dp))
         LazyColumn(modifier=Modifier.heightIn(max = 100.dp)) {
-            items(tarjetas) { tarjeta ->
-                mycard(tarjeta,{tarjetas.remove(tarjeta)})
+            items(state.objeto) { tarjeta ->
+                mycard(tarjeta,{viewmodel.eliminar(tarjeta)})
                 Spacer(modifier = Modifier.padding(5.dp))
             }
         }
@@ -66,5 +61,5 @@ fun inicioScreen(modifier: Modifier = Modifier){
 @Composable
 @Preview
 fun pr(){
-    inicioScreen(modifier = Modifier.fillMaxSize())
+    inicioScreen(modifier = Modifier.fillMaxSize().background(Color.White))
 }
