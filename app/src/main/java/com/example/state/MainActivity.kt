@@ -33,9 +33,9 @@ class MainActivity : ComponentActivity() {
                     var pantallas by remember { mutableIntStateOf(1) }
                     if (pantallas==1){
                     inicioScreen(
-                        modifier = Modifier.padding(innerPadding).fillMaxSize().background( Color.White),{pantalla->pantallas=pantalla}
+                        modifier = Modifier.padding(innerPadding).fillMaxSize().background( Color.White),clicko={pantalla->pantallas=pantalla}
                     )}else if (pantallas==2){pantalla2(
-                        modifier = Modifier.padding(innerPadding).fillMaxSize().background( Color.White),{pantalla->pantallas=pantalla}
+                        modifier = Modifier.padding(innerPadding).fillMaxSize().background( Color.White),clicko2={pantalla->pantallas=pantalla}
                     )}
                 }
             }
