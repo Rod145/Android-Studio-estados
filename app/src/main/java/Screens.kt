@@ -29,25 +29,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectorTaller(opciones: List<String>) {
-    var expandido by remember { mutableStateOf(false) }
-    var seleccion by rememberSaveable { mutableStateOf(opciones.first()) }
-
-    ExposedDropdownMenuBox(expanded = expandido, onExpandedChange = { expandido = it }) {
+fun SelectorTaller(viewmodel:Rviewmodel= viewModel()) {
+    val state=viewmodel.uiState.collectAsState().value
+    ExposedDropdownMenuBox(expanded = state.expandido, onExpandedChange = {viewmodel.expandido(it)}) {
         OutlinedTextField(
-            value = seleccion,
+            value = state.seleccion,
             onValueChange = {},
             readOnly = true,
             label = { Text("Taller") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandido) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(state.expandido) },
             modifier = Modifier.menuAnchor()
         )
-        ExposedDropdownMenu(expanded = expandido, onDismissRequest = { expandido = false }) {
-            opciones.forEach {
-                DropdownMenuItem(text = { Text(it) }, onClick = { seleccion = it; expandido = false })
+        ExposedDropdownMenu(expanded = state.expandido, onDismissRequest = { viewmodel.expandido(false)}) {
+            state.opciones.forEach {
+                DropdownMenuItem(text = { Text(it) }, onClick = { viewmodel.seleccion(it); viewmodel.expandido(false)})
             }
         }
     }
@@ -88,45 +88,44 @@ fun datos(modifier: Modifier,nombre:String,edad: String,correo: String,botoncito
     }
 }
 @Composable
-fun inicioScreen(modifier: Modifier= Modifier,bto:()-> Unit){
-    var identificarGmail by remember { mutableStateOf(false) }
-    var identificarEdad by remember { mutableStateOf(false) }
-    var identificarNombre by remember { mutableStateOf(false) }
-    var identificarMarca by remember { mutableStateOf(true) }
-    var valor by remember { mutableStateOf("") }
-    var valor2 by remember { mutableStateOf("") }
-    var valor3 by remember { mutableStateOf("") }
+fun inicioScreen(modifier: Modifier= Modifier,bto:()-> Unit, viewmodel: Rviewmodel=viewModel()){
+    val state=viewmodel.uiState.collectAsState().value
     Column(modifier = modifier.padding(16.dp)) {
         Text("Inscripción a talleres", color = Color.Black, fontSize = 22.sp)
         Spacer(modifier=Modifier.padding(top = 30.dp))
         Row{
             Text("Casa del Lago - Cupo limitado", color = Color.Black, fontSize = 14.sp)
         }
-        OutlinedTextField(value = valor,{valor=it}, label = {Text("Nombre completo")}, isError = identificarNombre , supportingText = {if (identificarNombre){Text("ingresa un nombre valido")} })
+        OutlinedTextField(value = state.valor,{viewmodel.valor(it)}, label = {Text("Nombre completo")}, isError = state.identificarNombre , supportingText = {if (state.identificarNombre){Text("ingresa un nombre valido")} })
         Spacer(modifier = Modifier.padding(5.dp))
-        OutlinedTextField(value = valor2,{valor2=it}, label = {Text("Correo")}, isError = identificarGmail , supportingText = {if (identificarGmail){Text("ingresa un correo valido")} })
+        OutlinedTextField(value = state.valor2,{viewmodel.valor2(it)}, label = {Text("Correo")}, isError = state.identificarGmail , supportingText = {if (state.identificarGmail){Text("ingresa un correo valido")} })
         Spacer(modifier = Modifier.padding(5.dp))
-        OutlinedTextField(value = valor3,{valor3=it}, label = {Text("Edad")}, isError = identificarEdad , supportingText = {if (identificarEdad){Text("ingresa una edad valida")} })
-        SelectorTaller(listOf("Fotografia","Dibujo",))
-        var marcado by rememberSaveable { mutableStateOf(false)}
+        OutlinedTextField(value = state.valor3,{viewmodel.valor3(it)}, label = {Text("Edad")}, isError = state.identificarEdad , supportingText = {if (state.identificarEdad){Text("ingresa una edad valida")} })
+        SelectorTaller()
             Row(verticalAlignment = Alignment.CenterVertically){
                 Checkbox(
-                    checked = marcado,
-                    onCheckedChange = { marcado = it })
+                    checked = state.marcado,
+                    onCheckedChange = { viewmodel.marcado(it) })
                 Text("Acepto el aviso de privacidad", color = Color.Black)
             }
-        if (!identificarMarca) {
+        if (!state.identificarMarca) {
             Text(
                 text = "Debes aceptar los términos",
                 color = Color.Red
             )
         }
-        OutlinedButton(onClick = {identificarMarca=marcado;identificarGmail=verificarArroba(valor2);identificarEdad=verificarEdad(valor3);identificarNombre=verificarNombre(valor);
-            val xd= !identificarGmail && !identificarNombre && !identificarEdad && marcado; if(xd){obe=objetofeo(valor,valor2,valor3);bto()}
+        OutlinedButton(onClick = {viewmodel.identificarMarca(state.marcado);viewmodel.identificarGmail(verificarArroba(state.valor2));viewmodel.identificarEdad(verificarEdad(state.valor3));viewmodel.identificarNombre(verificarNombre(state.valor));
+            val xd= !state.identificarGmail && !state.identificarNombre && !state.identificarEdad && state.marcado; if(xd){obe=objetofeo(state.valor,state.valor2,state.valor3);bto()}
         },modifier= Modifier.fillMaxWidth().height(50.dp)) {Text("Inscribirme",color = Color.Black) }
     }
 }
 @Composable
 @Preview
 fun pr(){
+    var pantalla by remember { mutableStateOf(1) }
+    if (pantalla==1){
+        inicioScreen(
+            modifier = Modifier.fillMaxSize().background(Color.White),{pantalla=2}
+        )}else{datos(modifier = Modifier.fillMaxSize().background(Color.White),obe.nombre,obe.edad,obe.correo,{pantalla=1})}
+
 }
