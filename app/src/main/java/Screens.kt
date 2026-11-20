@@ -27,11 +27,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class Gasto(val concepto: String, val monto: Int, val categoria: String)
 
@@ -58,22 +55,29 @@ fun verificarMonto(texto: String): Boolean {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun formularioGasto(modifier: Modifier = Modifier, onAgregar: (Gasto) -> Unit) {
-    var concepto by remember { mutableStateOf("") }
-    var monto by remember { mutableStateOf("") }
-    var categoria by remember { mutableStateOf("Comida") }
-    var expandido by remember { mutableStateOf(false) }
+fun formularioGasto(
+    modifier: Modifier = Modifier,
+    concepto: String,
+    monto: String,
+    categoria: String,
+    expandido: Boolean,
+    onConcepto: (String) -> Unit,
+    onMonto: (String) -> Unit,
+    onCategoria: (String) -> Unit,
+    onExpandido: (Boolean) -> Unit,
+    onAgregar: (Gasto) -> Unit
+) {
     val opciones = listOf("Comida", "Transporte", "Renta", "Ocio", "Otros")
     val invalido = concepto.isBlank() || verificarMonto(monto)
     Column(modifier = modifier) {
         Text("Nuevo gasto", color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.padding(top = 5.dp))
-        OutlinedTextField(value = concepto, onValueChange = { concepto = it }, label = { Text("Concepto") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(value = concepto, onValueChange = { onConcepto(it) }, label = { Text("Concepto") }, modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.padding(top = 5.dp))
         Row(modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(value = monto, onValueChange = { monto = it }, label = { Text("Monto") }, modifier = Modifier.weight(1f))
+            OutlinedTextField(value = monto, onValueChange = { onMonto(it) }, label = { Text("Monto") }, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(10.dp))
-            ExposedDropdownMenuBox(expanded = expandido, onExpandedChange = { expandido = it }, modifier = Modifier.weight(1f)) {
+            ExposedDropdownMenuBox(expanded = expandido, onExpandedChange = { onExpandido(it) }, modifier = Modifier.weight(1f)) {
                 OutlinedTextField(
                     value = categoria,
                     onValueChange = {},
@@ -82,9 +86,9 @@ fun formularioGasto(modifier: Modifier = Modifier, onAgregar: (Gasto) -> Unit) {
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandido) },
                     modifier = Modifier.menuAnchor().fillMaxWidth()
                 )
-                ExposedDropdownMenu(expanded = expandido, onDismissRequest = { expandido = false }) {
+                ExposedDropdownMenu(expanded = expandido, onDismissRequest = { onExpandido(false) }) {
                     opciones.forEach {
-                        DropdownMenuItem(text = { Text(it) }, onClick = { categoria = it; expandido = false })
+                        DropdownMenuItem(text = { Text(it) }, onClick = { onCategoria(it); onExpandido(false) })
                     }
                 }
             }
@@ -93,8 +97,8 @@ fun formularioGasto(modifier: Modifier = Modifier, onAgregar: (Gasto) -> Unit) {
         Button(
             onClick = {
                 onAgregar(Gasto(concepto, monto.toInt(), categoria))
-                concepto = ""
-                monto = ""
+                onConcepto("")
+                onMonto("")
             },
             enabled = !invalido,
             colors = ButtonColors(Color(0xFFE8DEF8), Color.Black, Color(0xFFEDEDED), Color.Gray),
@@ -166,18 +170,17 @@ fun tarjetaResumen(modifier: Modifier = Modifier, ingreso: Int, gastado: Int, po
 }
 
 @Composable
-fun inicioScreen(modifier: Modifier = Modifier) {
-    val gastos = remember { mutableStateListOf<Gasto>() }
-    var ingresoTexto by remember { mutableStateOf("4500") }
-    val ingreso = if (verificarMonto(ingresoTexto)) 0 else ingresoTexto.toInt()
+fun inicioScreen(modifier: Modifier = Modifier, viewmodel: Rviewmodel = viewModel()) {
+    val state = viewmodel.uiState.collectAsState().value
+    val ingreso = if (verificarMonto(state.ingresoTexto)) 0 else state.ingresoTexto.toInt()
     var gastado = 0
-    gastos.forEach { gastado += it.monto }
+    state.gastos.forEach { gastado += it.monto }
     val porcentaje = if (ingreso == 0) 0 else gastado * 100 / ingreso
     var mayor = ""
     var mayorMonto = 0
     listOf("Comida", "Transporte", "Renta", "Ocio", "Otros").forEach { categoria ->
         var suma = 0
-        gastos.forEach { if (it.categoria == categoria) { suma += it.monto } }
+        state.gastos.forEach { if (it.categoria == categoria) { suma += it.monto } }
         if (suma > mayorMonto) {
             mayorMonto = suma
             mayor = categoria
@@ -187,11 +190,11 @@ fun inicioScreen(modifier: Modifier = Modifier) {
         Text("Mi presupuesto", color = Color.Black, fontSize = 24.sp)
         Spacer(modifier = Modifier.padding(top = 10.dp))
         OutlinedTextField(
-            value = ingresoTexto,
-            onValueChange = { ingresoTexto = it },
+            value = state.ingresoTexto,
+            onValueChange = { viewmodel.ingresoTexto(it) },
             label = { Text("Ingreso mensual") },
-            isError = verificarMonto(ingresoTexto),
-            supportingText = { if (verificarMonto(ingresoTexto)) { Text("ingresa un monto valido") } },
+            isError = verificarMonto(state.ingresoTexto),
+            supportingText = { if (verificarMonto(state.ingresoTexto)) { Text("ingresa un monto valido") } },
             modifier = Modifier.fillMaxWidth()
         )
         tarjetaResumen(modifier = Modifier.fillMaxWidth(), ingreso = ingreso, gastado = gastado, porcentaje = porcentaje, mayor = mayor, mayorMonto = mayorMonto)
@@ -210,13 +213,24 @@ fun inicioScreen(modifier: Modifier = Modifier) {
             }
         }
         Spacer(modifier = Modifier.padding(top = 10.dp))
-        formularioGasto(modifier = Modifier.fillMaxWidth()) { gastos.add(it) }
+        formularioGasto(
+            modifier = Modifier.fillMaxWidth(),
+            concepto = state.concepto,
+            monto = state.monto,
+            categoria = state.categoria,
+            expandido = state.expandido,
+            onConcepto = { viewmodel.concepto(it) },
+            onMonto = { viewmodel.monto(it) },
+            onCategoria = { viewmodel.categoria(it) },
+            onExpandido = { viewmodel.expandido(it) },
+            onAgregar = { viewmodel.gastos(state.gastos + it) }
+        )
         Spacer(modifier = Modifier.padding(top = 10.dp))
         Text("Gastos recientes", color = Color.Black, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.padding(top = 5.dp))
         LazyColumn(modifier = Modifier.weight(1f)) {
-            items(gastos) { gasto ->
-                filaGasto(gasto = gasto) { gastos.remove(gasto) }
+            items(state.gastos) { gasto ->
+                filaGasto(gasto = gasto) { viewmodel.gastos(state.gastos.filter { it !== gasto }) }
             }
         }
     }
