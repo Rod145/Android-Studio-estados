@@ -19,12 +19,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,8 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-enum class Pantalla { Inicio, Pregunta, Resultados }
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class Pregunta(val enunciado: String, val opciones: List<String>, val correcta: Int)
 
@@ -204,7 +198,8 @@ fun pantallaResultados(modifier: Modifier = Modifier, nombre: String, puntaje: I
 }
 
 @Composable
-fun inicioScreen(modifier: Modifier = Modifier) {
+fun inicioScreen(modifier: Modifier = Modifier, viewmodel: Rviewmodel = viewModel()) {
+    val state = viewmodel.uiState.collectAsState().value
     val preguntas = listOf(
         Pregunta("¿Qué tipo de dato conviene usar para guardar el valor 3.14?", listOf("Int", "Double", "String", "Boolean"), 1),
         Pregunta("¿Qué estructura repite código mientras se cumpla una condición?", listOf("if", "while", "when", "class"), 1),
@@ -212,61 +207,55 @@ fun inicioScreen(modifier: Modifier = Modifier) {
         Pregunta("¿Cuál es el resultado de 7 % 3?", listOf("1", "2", "3", "0"), 0),
         Pregunta("¿Qué índice tiene el primer elemento de una lista?", listOf("1", "0", "-1", "2"), 1)
     )
-    var pantalla by remember { mutableStateOf(Pantalla.Inicio) }
-    var nombre by remember { mutableStateOf("") }
-    var indice by rememberSaveable { mutableIntStateOf(0) }
-    var puntaje by rememberSaveable { mutableIntStateOf(0) }
-    var seleccion by rememberSaveable { mutableIntStateOf(-1) }
-    var confirmado by remember { mutableStateOf(false) }
-    when (pantalla) {
+    when (state.pantalla) {
         Pantalla.Inicio -> pantallaInicio(
             modifier = modifier.padding(16.dp),
-            nombre = nombre,
-            onNombre = { nombre = it },
-            onComenzar = { pantalla = Pantalla.Pregunta }
+            nombre = state.nombre,
+            onNombre = { viewmodel.nombre(it) },
+            onComenzar = { viewmodel.pantalla(Pantalla.Pregunta) }
         )
         Pantalla.Pregunta -> pantallaPregunta(
             modifier = modifier.padding(16.dp),
-            pregunta = preguntas[indice],
-            numero = indice + 1,
-            puntaje = puntaje,
-            seleccion = seleccion,
-            confirmado = confirmado,
-            onSeleccion = { seleccion = it },
+            pregunta = preguntas[state.indice],
+            numero = state.indice + 1,
+            puntaje = state.puntaje,
+            seleccion = state.seleccion,
+            confirmado = state.confirmado,
+            onSeleccion = { viewmodel.seleccion(it) },
             onConfirmar = {
-                confirmado = true
-                if (seleccion == preguntas[indice].correcta) {
-                    puntaje += 1
+                viewmodel.confirmado(true)
+                if (state.seleccion == preguntas[state.indice].correcta) {
+                    viewmodel.puntaje(state.puntaje + 1)
                 }
             },
             onSiguiente = {
-                if (indice == 4) {
-                    pantalla = Pantalla.Resultados
+                if (state.indice == 4) {
+                    viewmodel.pantalla(Pantalla.Resultados)
                 } else {
-                    indice += 1
-                    seleccion = -1
-                    confirmado = false
+                    viewmodel.indice(state.indice + 1)
+                    viewmodel.seleccion(-1)
+                    viewmodel.confirmado(false)
                 }
             }
         )
         Pantalla.Resultados -> pantallaResultados(
             modifier = modifier.padding(16.dp),
-            nombre = nombre.trim(),
-            puntaje = puntaje,
+            nombre = state.nombre.trim(),
+            puntaje = state.puntaje,
             onReintentar = {
-                indice = 0
-                puntaje = 0
-                seleccion = -1
-                confirmado = false
-                pantalla = Pantalla.Pregunta
+                viewmodel.indice(0)
+                viewmodel.puntaje(0)
+                viewmodel.seleccion(-1)
+                viewmodel.confirmado(false)
+                viewmodel.pantalla(Pantalla.Pregunta)
             },
             onCambiar = {
-                nombre = ""
-                indice = 0
-                puntaje = 0
-                seleccion = -1
-                confirmado = false
-                pantalla = Pantalla.Inicio
+                viewmodel.nombre("")
+                viewmodel.indice(0)
+                viewmodel.puntaje(0)
+                viewmodel.seleccion(-1)
+                viewmodel.confirmado(false)
+                viewmodel.pantalla(Pantalla.Inicio)
             }
         )
     }
